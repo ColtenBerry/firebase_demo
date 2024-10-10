@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'firebase_options.dart';
 import 'guest_book_message.dart';
 
-enum Attending { yes, no, unknown }
+// enum Attending { yes, no, unknown }
 
 class ApplicationState extends ChangeNotifier {
   ApplicationState() {
@@ -26,20 +26,44 @@ class ApplicationState extends ChangeNotifier {
   List<GuestBookMessage> get guestBookMessages => _guestBookMessages;
 
   int _attendees = 0;
-  int get attendees => _attendees;
+  int get attendees {
+    return _attendees;
+  }
 
-  Attending _attending = Attending.unknown;
-  StreamSubscription<DocumentSnapshot>? _attendingSubscription;
-  Attending get attending => _attending;
-  set attending(Attending attending) {
+  // Attending _attending = Attending.unknown;
+  // StreamSubscription<DocumentSnapshot>? _attendingSubscription;
+  // Attending get attending {
+  //   return _attending;
+  // }
+
+  //delete attending. Fix the app after this.
+
+  // set attending(Attending attending) {
+  //   print("Attending is $attending");
+  //   final userDoc = FirebaseFirestore.instance
+  //       .collection('attendees')
+  //       .doc(FirebaseAuth.instance.currentUser!.uid);
+  //   if (attending == Attending.yes) {
+  //     userDoc.set(<String, dynamic>{'attending': true});
+  //   } else {
+  //     userDoc.set(<String, dynamic>{'attending': false});
+  //   }
+  // }
+
+  //I tried to coppy the attending thing for this
+
+  int _numAttending = 0;
+  StreamSubscription<DocumentSnapshot>? _numAttendingSubscription;
+  int get numAttending {
+    return _numAttending;
+  }
+
+  set numAttending(int numAttending) {
+    print("this is the number of people atteding: " + numAttending.toString());
     final userDoc = FirebaseFirestore.instance
         .collection('attendees')
         .doc(FirebaseAuth.instance.currentUser!.uid);
-    if (attending == Attending.yes) {
-      userDoc.set(<String, dynamic>{'attending': true});
-    } else {
-      userDoc.set(<String, dynamic>{'attending': false});
-    }
+    userDoc.set(<String, dynamic>{'numAttending': numAttending});
   }
 
   Future<void> init() async {
@@ -50,16 +74,22 @@ class ApplicationState extends ChangeNotifier {
       EmailAuthProvider(),
     ]);
 
-    // Add from here...
     FirebaseFirestore.instance
         .collection('attendees')
-        .where('attending', isEqualTo: true)
         .snapshots()
         .listen((snapshot) {
       _attendees = snapshot.docs.length;
+      _attendees = 0;
+      for (final entry in snapshot.docs) {
+        print("Line 81. Entry.data()${entry.data()['numAttending']}");
+        if (entry.data()['numAttending'] != null) {
+          print(
+              "Line 83. entry.data() must not be null. This is it: ${entry.data()}");
+          _attendees = _attendees + entry.data()['numAttending'] as int;
+        }
+      }
       notifyListeners();
     });
-    // ...to here.
 
     FirebaseAuth.instance.userChanges().listen((user) {
       if (user != null) {
@@ -81,30 +111,29 @@ class ApplicationState extends ChangeNotifier {
           }
           notifyListeners();
         });
-        // Add from here...
-        _attendingSubscription = FirebaseFirestore.instance
-            .collection('attendees')
-            .doc(user.uid)
-            .snapshots()
-            .listen((snapshot) {
-          if (snapshot.data() != null) {
-            if (snapshot.data()!['attending'] as bool) {
-              _attending = Attending.yes;
-            } else {
-              _attending = Attending.no;
-            }
-          } else {
-            _attending = Attending.unknown;
-          }
-          notifyListeners();
-        });
-        // ...to here.
+
+        // _attendingSubscription = FirebaseFirestore.instance
+        //     .collection('attendees')
+        //     .doc(user.uid)
+        //     .snapshots()
+        //     .listen((snapshot) {
+        //   if (snapshot.data() != null) {
+        //     if (snapshot.data()!['attending'] as bool) {
+        //       _attending = Attending.yes;
+        //     } else {
+        //       _attending = Attending.no;
+        //     }
+        //   } else {
+        //     _attending = Attending.unknown;
+        //   }
+        //   notifyListeners();
+        // });
       } else {
         _loggedIn = false;
         _emailVerified = false;
         _guestBookMessages = [];
         _guestBookSubscription?.cancel();
-        _attendingSubscription?.cancel(); // new
+        // _attendingSubscription?.cancel();
       }
       notifyListeners();
     });
