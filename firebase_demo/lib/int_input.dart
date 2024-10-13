@@ -5,9 +5,9 @@ import 'app_state.dart';
 import 'src/widgets.dart';
 
 class IntInput extends StatelessWidget {
-  const IntInput({super.key, required this.onSelection});
-  final bool state = false;
-  final void Function(int numAttending) onSelection;
+  const IntInput({super.key, required this.onSelection, required this.state});
+  final bool state;
+  final void Function(int numAttending, bool state) onSelection;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class IntInput extends StatelessWidget {
               // ),
               const SizedBox(width: 8),
               TextButton(
-                onPressed: () => onSelection(0),
+                onPressed: () => onSelection(0, false),
                 child: const Text('CANCEL RSVP'),
               ),
             ],

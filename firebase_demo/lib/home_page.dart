@@ -60,9 +60,12 @@ class HomePage extends StatelessWidget {
                   //     appState.attending = attending;
                   //   },
                   // ),
-                  IntInput(onSelection: (numAttending) {
-                    appState.numAttending = numAttending;
-                  }),
+                  IntInput(
+                      onSelection: (numAttending, state) {
+                        appState.numAttending = numAttending;
+                        appState.attending = state;
+                      },
+                      state: appState.attending),
                   const Header('Discussion'),
                   GuestBook(
                     addMessage: (message) =>

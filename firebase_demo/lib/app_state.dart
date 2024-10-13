@@ -30,7 +30,7 @@ class ApplicationState extends ChangeNotifier {
     return _attendees;
   }
 
-  // Attending _attending = Attending.unknown;
+  var attending = false;
   // StreamSubscription<DocumentSnapshot>? _attendingSubscription;
   // Attending get attending {
   //   return _attending;

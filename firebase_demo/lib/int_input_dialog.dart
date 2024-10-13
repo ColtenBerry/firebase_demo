@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:gtk_flutter/app_state.dart';
 
 class IntInputDialog extends StatefulWidget {
-  final Function(int numAttending) onSelection; //callback function
+  final Function(int numAttending, bool state) onSelection; //callback function
 
   const IntInputDialog({super.key, required this.onSelection});
 
@@ -44,7 +44,7 @@ class IntInputDialogState extends State<IntInputDialog> {
               onPressed: () {
                 setState(() {
                   print("This is the numAttendees: $numAttendees");
-                  widget.onSelection(numAttendees);
+                  widget.onSelection(numAttendees, true);
                 });
                 Navigator.pop(context);
               },
